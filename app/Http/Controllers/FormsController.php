@@ -34,22 +34,15 @@ class FormsController extends Controller
             ]);
         }
 
-        if(!empty(Form::where("name", $req->name)->first()))
-        {
-            return response()->json([
-                "message" => "Form already exsist"
-            ],401);
-        }
-
         $form = new Form;
         $allowed_domain = new AllowedDomain;
-        $form->create([
+        $create_form = $form->create([
             "name" => $req->name,
             "description" => $req->description,
             "slug" => $req->slug,
             "limit_one_response" => $req->limit_one_response,
             "creator_id" => auth()->user()->id
-        ])->save();
+        ]);
 
         if(!empty($req->allowed_domains)) {
             for($i = 0; $i < count($req->allowed_domains); $i++) {
@@ -61,7 +54,7 @@ class FormsController extends Controller
         }
 
         return response()
-        ->json(Form::where("name", $req->name)
+        ->json(Form::where("id", $create_form->id)
         ->first(), 200);
 
     }
@@ -104,10 +97,11 @@ class FormsController extends Controller
                 "form" => $realDetailForm,
             ], 200);
 
-        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain)) {
+        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain) 
+        && AllowedDomain::where("form_id", $data->id)->first() ) {
             return response()->json([
-                "message" => "Unauthorized",
-            ], 200);
+                "message" => "Forbidden access",
+            ], 403);
         } else {            
             return response()->json([
                 "message" => "Get form success",
