@@ -21,18 +21,17 @@
 $router->group(["prefix" => "api"], function() use($router) {
     $router->group(["prefix" => "auth"], function() use($router) {
         $router->post("login", "AuthController@login");
-
         $router->group(["middleware" => "auth"], function() use($router) {
             $router->get("me", "AuthController@me");
             $router->get("logout", "AuthController@logout");
         });
-
-
     });
 
-    $router->group(["prefix" => "form"], function() use($router) {
+    $router->group(["prefix" => "forms"], function() use($router) {
         $router->group(["middleware" => "auth"], function() use($router) {
          $router->post("/", "FormsController@create");
+         $router->get("/", "FormsController@getAll");
+         $router->get("/{slug}", "FormsController@detailForm");
         });
     });
 

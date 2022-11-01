@@ -21,7 +21,7 @@ return new class extends Migration
             ->cascadeOnDelete();
             $table->string("name");
             $table->enum("choice_type", ['short_answer', 'paragraph', 'data', 'time', 'multiple_choice', 'drop_down', 'checkboxes']);
-            $table->string("choices");
+            $table->string("choices")->nullable();
             $table->boolean("is_required");
             $table->timestamps();
         });

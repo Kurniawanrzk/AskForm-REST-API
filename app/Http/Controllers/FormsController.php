@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\{Form, AllowedDomain, User};
+use App\Models\{Form, AllowedDomain, Question, User};
 
 
 class FormsController extends Controller
@@ -67,5 +67,55 @@ class FormsController extends Controller
     }
 
     public function getAll()
-    {}
+    {
+        return Form::all();
+    }
+
+    public function detailForm(Request $req, $slug)
+    {
+        if(!$data = Form::where("slug", $slug)->first() ) {
+            return response()->json([
+                "message" => "From not found"
+            ], 401);
+        }
+        $allowed_domain = AllowedDomain::where("form_id", $data->id)->get();
+        $arrayDomain = [];
+        for($i = 0; $i < count($allowed_domain); $i++) {
+            $arrayDomain[] = $allowed_domain[$i]->domain;
+        }
+        
+        $realDetailForm = [
+            "id" => $data->id,
+            "name" => $data->name,
+            "slug" => $data->slug,
+            "description" => $data->description,
+            "limit_one_response" => $data->limit_one_response,
+            "creator_id" => $data->creator_id,
+            "allowed_domains" => $arrayDomain,
+            "questions" => Question::where("form_id", $data->id)->get()
+
+        ];
+
+
+        if(array_search(explode("@", auth()->user()->email)[1],$arrayDomain))
+        {
+            return response()->json([
+                "message" => "Get form success",
+                "form" => $realDetailForm,
+            ], 200);
+
+        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain)) {
+            return response()->json([
+                "message" => "Unauthorized",
+            ], 200);
+        } else {            
+            return response()->json([
+                "message" => "Get form success",
+                "form" => $realDetailForm,
+            ], 200);
+        }
+
+
+
+    }
 }

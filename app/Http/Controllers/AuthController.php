@@ -30,7 +30,7 @@ class AuthController extends Controller
         }
 
         if(!$token = 
-        Auth::attempt(["email" => $req->email, "password" => $req->password])) {  
+        auth()->setTTL(1440)->attempt(["email" => $req->email, "password" => $req->password])) {  
             return response()->json([
                 "message" => "Email or password incorrect"
             ]);
@@ -39,7 +39,7 @@ class AuthController extends Controller
         return response()->json([
             "access_token" => $token,
             "token_type" => "Bearer",
-            "expires_in" => auth()->factory()->getTTL() * 24
+            "expires_in" => 1440
         ], 200);
     }
 
