@@ -34,6 +34,13 @@ class FormsController extends Controller
             ]);
         }
 
+        if(!empty(Form::where("slug", $req->slug)->first()))
+        {
+            return response()->json([
+                "message" => "Change the slug, already exist!"
+            ],401);
+        }
+
         $form = new Form;
         $allowed_domain = new AllowedDomain;
         $create_form = $form->create([
@@ -56,6 +63,7 @@ class FormsController extends Controller
         return response()
         ->json(Form::where("id", $create_form->id)
         ->first(), 200);
+
 
     }
 
@@ -97,11 +105,10 @@ class FormsController extends Controller
                 "form" => $realDetailForm,
             ], 200);
 
-        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain) 
-        && AllowedDomain::where("form_id", $data->id)->first() ) {
+        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain)) {
             return response()->json([
-                "message" => "Forbidden access",
-            ], 403);
+                "message" => "Unauthorized",
+            ], 200);
         } else {            
             return response()->json([
                 "message" => "Get form success",
