@@ -34,6 +34,7 @@ $router->group(["prefix" => "api"], function() use($router) {
          $router->get("/{slug}", "FormsController@detailForm");
          $router->post("/{slug}/questions", "QuestionsController@create");
          $router->delete("/{slug}/questions/{question_id}", "QuestionsController@delete");
+         $router->post("/{slug}/responses", "ResponsesController@create");
         });
     });
 

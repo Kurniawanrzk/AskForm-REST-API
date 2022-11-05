@@ -98,18 +98,25 @@ class FormsController extends Controller
         ];
 
 
-        if(array_search(explode("@", auth()->user()->email)[1],$arrayDomain))
+        if(empty($arrayDomain)){
+            return response()->json([
+                "message" => "Get form success",
+                "form" => $realDetailForm,
+            ], 200);
+
+        }else if(in_array(explode("@", auth()->user()->email)[1],$arrayDomain))
         {
             return response()->json([
                 "message" => "Get form success",
                 "form" => $realDetailForm,
             ], 200);
 
-        } else if(!array_search(explode("@", auth()->user()->email)[1],$arrayDomain)) {
+        } else if(!in_array(explode("@", auth()->user()->email)[1],$arrayDomain) && ($data->creator_id !== auth()->user()->id)) {
             return response()->json([
-                "message" => "Unauthorized",
-            ], 200);
-        } else {            
+                "message" => "forbidden",
+            ], 400);
+
+        } else if($data->creator_id === auth()->user()->id) {
             return response()->json([
                 "message" => "Get form success",
                 "form" => $realDetailForm,
